@@ -1,4 +1,4 @@
-# Baidu OCR 支持AeasyADB
+# AeasyADB
 
 ## Introduction
 
