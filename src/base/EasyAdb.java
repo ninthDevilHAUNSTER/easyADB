@@ -4,6 +4,9 @@ import com.android.ddmlib.*;
 import exception.*;
 import org.apache.log4j.Logger;
 
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -18,7 +21,7 @@ public class EasyAdb {
     protected int DeviceId = 0;
     //    private
     private StringBuffer buffer;
-    private CollectingOutputReceiver receiver = new CollectingOutputReceiver();
+    private final CollectingOutputReceiver receiver = new CollectingOutputReceiver();
 
 
     public EasyAdb(boolean do_init) throws DeviceNotFoundException {
@@ -39,7 +42,7 @@ public class EasyAdb {
      * @param Y Y坐标
      */
     public void simulateTap(int X, int Y) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        executeCommand("input tap " + String.valueOf(X) + " " + String.valueOf(Y));
+        executeCommand(String.format("input tap %d %d", X, Y));
     }
 
     /**
@@ -51,7 +54,7 @@ public class EasyAdb {
     public void simulateTap(int X, int Y, int biasX, int biasY) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         int _biasX = (int) (Math.random() * biasX * 2) - biasX;
         int _biasY = (int) (Math.random() * biasY * 2) - biasY;
-        executeCommand("input tap " + String.valueOf(X + _biasX) + " " + String.valueOf(Y + _biasY));
+        executeCommand(String.format("input tap %d %d", X + _biasX, Y + _biasY));
     }
 
     /**
@@ -86,6 +89,58 @@ public class EasyAdb {
     public void restartApplication(String application_name) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
         closeApplication(application_name);
         openApplication(application_name);
+    }
+
+    /**
+     * @param X      起始X坐标
+     * @param Y      起始Y坐标
+     * @param width  截图的宽度（X+width为终点X坐标）
+     * @param height 截图的长度（Y+width为终点Y坐标
+     * @return BufferedImage类，也就是保存在内存中的图片
+     */
+    public BufferedImage getScreenshot(int X, int Y, int width, int height) throws AdbCommandRejectedException, IOException, TimeoutException, ScreenshotNullImageException {
+        BufferedImage image = takeScreenshot();
+        //判断x、y方向是否超过图像最大范围
+        if ((X + width) >= image.getWidth()) {
+            width = image.getWidth() - X;
+        }
+        if ((Y + height) >= image.getHeight()) {
+            height = image.getHeight() - Y;
+        }
+        BufferedImage resultImage = new BufferedImage(width, height, image.getType());
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int rgb = image.getRGB(x + X, y + Y);
+                resultImage.setRGB(x, y, rgb);
+            }
+        }
+        return resultImage;
+    }
+
+    public BufferedImage getScreenshot() throws AdbCommandRejectedException, IOException, TimeoutException, ScreenshotNullImageException {
+        return takeScreenshot();
+    }
+
+
+    private BufferedImage takeScreenshot() throws AdbCommandRejectedException, IOException, TimeoutException, ScreenshotNullImageException {
+        // 这个RAW IMAGE 类真的看不懂它在干啥，之后能修改可以修改一下
+        RawImage rawScreen = device.getScreenshot();
+        if (rawScreen != null) {
+            int width = rawScreen.width;
+            int height = rawScreen.height;
+            BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+            int index = 0;
+            int indexInc = rawScreen.bpp >> 3;
+            for (int y = 0; y < rawScreen.height; y++) {
+                for (int x = 0; x < rawScreen.width; x++, index += indexInc) {
+                    int value = rawScreen.getARGB(index);
+                    image.setRGB(x, y, value);
+                }
+            }
+            return image;
+        } else {
+            throw new ScreenshotNullImageException();
+        }
     }
 
 
