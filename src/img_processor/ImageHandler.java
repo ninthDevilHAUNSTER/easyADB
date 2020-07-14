@@ -38,7 +38,14 @@ public class ImageHandler {
         return p.imgCheck(img1, img2, 10);
     }
 
-    public boolean compareImageWithSSMI(BufferedImage img1, BufferedImage img2) {
+    private boolean compareImageWithSSMI(BufferedImage img1, BufferedImage img2) {
+        // 网上没找到JAVA的代码，不会要我自己写吧
         return false;
     }
+
+    private boolean compareImageWithGradationHistogram(BufferedImage img1, BufferedImage img2) {
+        // 网上没找到JAVA的代码，不会要我自己写吧
+        return false;
+    }
+
 }

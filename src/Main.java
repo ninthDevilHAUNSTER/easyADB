@@ -12,12 +12,7 @@ public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        EasyAdb adb = new EasyAdb(true);
-
-//        logger.info(adb.checkApplicationActive("shaobao"));
-//        logger.info(adb.checkApplicationActive("com.hypergryph.arknights"));
-        BufferedImage image = adb.getScreenshot();
-        ImageIO.write(image, "PNG", new File("test.png"));
+        System.out.println(System.getProperty("os.name"));
     }
 }
 

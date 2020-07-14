@@ -2,11 +2,15 @@ package base;
 
 import com.android.ddmlib.*;
 import exception.*;
+import net.sourceforge.yamlbeans.YamlException;
+import ocr_processor.BaiduOcr;
+import ocr_processor.BaseOcr;
 import org.apache.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -17,15 +21,17 @@ public class EasyAdb {
     public IDevice device;
     public static EasyAdbLogger logger = new EasyAdbLogger();
 
-    //    protected
-    protected int DeviceId = 0;
     //    private
+    private BaseOcr ocr;
+    private String os_location;
     private StringBuffer buffer;
     private final CollectingOutputReceiver receiver = new CollectingOutputReceiver();
 
 
-    public EasyAdb(boolean do_init) throws DeviceNotFoundException {
+    public EasyAdb(boolean do_init) throws DeviceNotFoundException, YamlException, FileNotFoundException, OcrEngineNotActiveException {
         // 初始化adb
+        this.ocr = new BaiduOcr();
+        this.ocr.isOcrActive();
         if (do_init) {
             createDevice();
         }
@@ -121,7 +127,6 @@ public class EasyAdb {
         return takeScreenshot();
     }
 
-
     private BufferedImage takeScreenshot() throws AdbCommandRejectedException, IOException, TimeoutException, ScreenshotNullImageException {
         // 这个RAW IMAGE 类真的看不懂它在干啥，之后能修改可以修改一下
         RawImage rawScreen = device.getScreenshot();
@@ -142,7 +147,6 @@ public class EasyAdb {
             throw new ScreenshotNullImageException();
         }
     }
-
 
     private void createDevice() throws DeviceNotFoundException {
         AndroidDebugBridge.init(false);
@@ -204,4 +208,5 @@ public class EasyAdb {
             }
         }
     }
+
 }
