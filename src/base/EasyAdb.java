@@ -12,7 +12,7 @@ public class EasyAdb {
 
     //    public
     public IDevice device;
-    public static Logger logger = Logger.getLogger(EasyAdb.class.getName());
+    public static EasyAdbLogger logger = new EasyAdbLogger();
 
     //    protected
     protected int DeviceId = 0;
@@ -29,10 +29,64 @@ public class EasyAdb {
     }
 
     public void executeCommand(String command) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        EasyAdbLogger.logger.debug(command);
         this.device.executeShellCommand(command, this.receiver);
-        System.out.println(this.receiver.getOutput());
+        EasyAdbLogger.logger.debug(this.receiver.getOutput());
     }
 
+    /**
+     * @param X X坐标
+     * @param Y Y坐标
+     */
+    public void simulateTap(int X, int Y) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        executeCommand("input tap " + String.valueOf(X) + " " + String.valueOf(Y));
+    }
+
+    /**
+     * @param X     X坐标
+     * @param Y     Y坐标
+     * @param biasX X的随机偏移，将返回 [X-bias,X+bias] 范围内的随机整数
+     * @param biasY Y的随机偏移，将返回 [Y-bias,Y+bias] 范围内的随机整数
+     */
+    public void simulateTap(int X, int Y, int biasX, int biasY) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        int _biasX = (int) (Math.random() * biasX * 2) - biasX;
+        int _biasY = (int) (Math.random() * biasY * 2) - biasY;
+        executeCommand("input tap " + String.valueOf(X + _biasX) + " " + String.valueOf(Y + _biasY));
+    }
+
+    /**
+     * 模拟鼠标滑动
+     * adb shell input swipe X1 Y1 X2 Y2
+     *
+     * @param X1 起始点X坐标
+     * @param Y1 起始点Y坐标
+     * @param X2 终点X坐标
+     * @param Y2 终点Y坐标
+     */
+    public void simulateSwipe(int X1, int Y1, int X2, int Y2) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        executeCommand(String.format("input swipe %d %d %d %d", X1, Y1, X2, Y2));
+    }
+
+    public void closeApplication(String application_name) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        executeCommand(String.format("am force-stop %s", application_name));
+    }
+
+    public void openApplication(String application_name) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        executeCommand(String.format("am start -n %s", application_name));
+    }
+
+    public boolean checkApplicationActive(String application_name) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+//        dumpsys window windows | findstr \"Current\"
+//        com.hypergryph.arknights/com.u8.sdk.U8UnityContext
+        this.device.executeShellCommand("dumpsys window windows | grep \"Current\"", this.receiver);
+        String output = this.receiver.getOutput();
+        return output.contains(application_name);
+    }
+
+    public void restartApplication(String application_name) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
+        closeApplication(application_name);
+        openApplication(application_name);
+    }
 
 
     private void createDevice() throws DeviceNotFoundException {
@@ -43,13 +97,12 @@ public class EasyAdb {
         IDevice[] devices = bridge.getDevices();
         if (devices.length == 0) {
             // no device
+            EasyAdbLogger.print("检测到 0 台 连接设备，初始化失败", 2, 4);
             throw new DeviceNotFoundException("检测到 0 台 连接设备，初始化失败");
-        }
-        else if (devices.length == 1) {
+        } else if (devices.length == 1) {
             // one device
             this.device = devices[0];
-        }
-        else {
+        } else {
             // muti device
             for (int i = 0; i < devices.length; i++) {
                 System.out.println("[ " + (i + 1) + " ]" + devices[i].getName());
@@ -59,7 +112,7 @@ public class EasyAdb {
             int i = 0;
             boolean FlAG = false;
             while (!FlAG) {
-                System.out.print("发现多个设备，自动连接失败。请输入编号：,输入0退出当前程序");
+                EasyAdbLogger.print("发现多个设备，自动连接失败。请输入编号：,输入0退出当前程序");
                 if (scan.hasNextInt()) {
                     // 判断输入的是否是整数
                     i = scan.nextInt();
@@ -71,15 +124,15 @@ public class EasyAdb {
                     } else if (i == 0) {
                         System.exit(0);
                     } else {
-                        System.out.println("输入不正确！");
+                        EasyAdbLogger.print("输入不正确！");
                     }
                 } else {
                     // 输入错误的信息
-                    System.out.println("输入不正确！");
+                    EasyAdbLogger.print("输入不正确！");
                 }
             }
         }
-        System.out.println("设备连接成功，当前设备名称\t" + this.device.getName());
+        EasyAdbLogger.logger.info("设备连接成功，当前设备名称\t" + this.device.getName());
     }
 
     private static void waitForDevice(AndroidDebugBridge bridge) {
@@ -91,7 +144,7 @@ public class EasyAdb {
             } catch (InterruptedException ignored) {
             }
             if (count > 300) {
-                System.err.print("Time out");
+                EasyAdbLogger.logger.error("Time out");
                 break;
             }
         }
