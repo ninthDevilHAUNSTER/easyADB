@@ -1,18 +1,12 @@
 
-import java.io.*;
-import java.util.Scanner;
-
+import base.EasyAdb;
 
 
 public class Main {
 
 
     public static void main(String[] args) throws Exception {
-        Scanner scanner =new Scanner(System.in);
-
-
-
-//        EasyADB adb = new EasyADB(true);
+        EasyAdb adb = new EasyAdb(true);
 
     }
 }

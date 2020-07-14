@@ -1,10 +1,13 @@
+package base;
+
 import com.android.ddmlib.*;
+import exception.*;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.util.Scanner;
 
-class EasyAdb {
+public class EasyAdb {
 //    variables
 
     //    public
@@ -30,12 +33,6 @@ class EasyAdb {
         System.out.println(this.receiver.getOutput());
     }
 
-    public void simulateTap(String command, int X, int Y) throws Exception {
-//        TODO : ADD RANDOM METHOD
-        this.device.executeShellCommand(
-                command, this.receiver
-        );
-    }
 
 
     private void createDevice() throws DeviceNotFoundException {
@@ -47,19 +44,21 @@ class EasyAdb {
         if (devices.length == 0) {
             // no device
             throw new DeviceNotFoundException("检测到 0 台 连接设备，初始化失败");
-        } else if (devices.length == 1) {
+        }
+        else if (devices.length == 1) {
             // one device
             this.device = devices[0];
-        } else {
+        }
+        else {
             // muti device
             for (int i = 0; i < devices.length; i++) {
-                System.out.println("[ " + (i + 1) + " ]" + devices[i].getAvdName());
+                System.out.println("[ " + (i + 1) + " ]" + devices[i].getName());
             }
             Scanner scan = new Scanner(System.in);
             // 从键盘接收数据
             int i = 0;
             boolean FlAG = false;
-            while (FlAG) {
+            while (!FlAG) {
                 System.out.print("发现多个设备，自动连接失败。请输入编号：,输入0退出当前程序");
                 if (scan.hasNextInt()) {
                     // 判断输入的是否是整数
@@ -80,6 +79,7 @@ class EasyAdb {
                 }
             }
         }
+        System.out.println("设备连接成功，当前设备名称\t" + this.device.getName());
     }
 
     private static void waitForDevice(AndroidDebugBridge bridge) {
