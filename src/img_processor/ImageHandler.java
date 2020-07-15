@@ -4,7 +4,9 @@ import com.android.ddmlib.AdbCommandRejectedException;
 import com.android.ddmlib.TimeoutException;
 import exception.ScreenshotNullImageException;
 
+import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 
 public class ImageHandler {
@@ -43,9 +45,10 @@ public class ImageHandler {
         return false;
     }
 
-    private boolean compareImageWithGradationHistogram(BufferedImage img1, BufferedImage img2) {
-        // 网上没找到JAVA的代码，不会要我自己写吧
-        return false;
+    private boolean compareImageWithColorHistogram(BufferedImage img1, BufferedImage img2) {
+        ImageColorHistogram is = new ImageColorHistogram();
+        double rate = is.colorHistogramSimilarity(img1, img2);
+        return rate > 0.95;
     }
 
 }
