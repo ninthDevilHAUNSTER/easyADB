@@ -47,9 +47,11 @@ public class EasyAdb {
             if (OS.isWindows()) {
                 adb_path = Paths.get("ADB", "win", "adb.exe").toAbsolutePath();
             } else if (OS.isLinux()) {
-                adb_path = Paths.get("ADB", "linux").toAbsolutePath();
+                throw new FileNotFoundException("adb指令未安装，请输入类似 'apt-get install adb '的指令安装");
+//                adb_path = Paths.get("ADB", "linux").toAbsolutePath();
             } else if (OS.isMacOSX()) {
-                adb_path = Paths.get("ADB", "mac").toAbsolutePath();
+                throw new FileNotFoundException("adb指令未安装，请输入类似 'brew cask install android-platform-tools' 的指令安装");
+//                adb_path = Paths.get("ADB", "mac").toAbsolutePath();
             } else {
                 adb_path = Paths.get("ADB", "win", "adb.exe").toAbsolutePath();
             }
