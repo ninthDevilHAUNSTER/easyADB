@@ -10,6 +10,7 @@ import net.sourceforge.yamlbeans.YamlException;
 import net.sourceforge.yamlbeans.YamlReader;
 import ocr_processor.BaiduOcr;
 import ocr_processor.BaseOcr;
+import ocr_processor.TesseractOcr;
 import org.apache.log4j.Logger;
 
 import javax.imageio.ImageIO;
@@ -24,11 +25,11 @@ import org.jdesktop.swingx.util.OS;
 public class Test {
     public static Logger logger = Logger.getLogger(EasyAdb.class.getName());
 
-    private static void testOrientFunction() throws YamlException, IOException {
-        BaseOcr ocr = new BaiduOcr();
+    private static void testOrientFunction() throws Exception {
+        BaseOcr ocr = new TesseractOcr();
         InputStream is = new FileInputStream(new File("storage/ORIENT_TEST.png"));
         BufferedImage img = ImageIO.read(is);
-        logger.info(ocr.orientText(img, "TW-8"));
+        logger.info(ocr.recognizeSingleText(img));
     }
 
     private static void testAdbConnection() throws Exception {
@@ -38,7 +39,7 @@ public class Test {
 
 
     public static void main(String[] args) throws Exception {
-        testAdbConnection();
+        testOrientFunction();
     }
 }
 

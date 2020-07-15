@@ -5,9 +5,10 @@ import net.sourceforge.yamlbeans.YamlException;
 
 import java.awt.image.BufferedImage;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
 public interface BaseOcr {
-    public String recognizeSingleText(BufferedImage img);
+    public String recognizeSingleText(BufferedImage img) throws IOException, InterruptedException;
 
     public String recognizeMultiText(BufferedImage img);
 
