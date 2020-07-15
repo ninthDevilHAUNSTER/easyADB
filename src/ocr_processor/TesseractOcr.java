@@ -30,50 +30,18 @@ public class TesseractOcr implements BaseOcr {
     }
 
     private String preprocessCmdCommand(BufferedImage img) throws IOException, InterruptedException {
-
-        List<String> lcommand = new ArrayList<String>();
-//        lcommand.add(Paths.get(tessPath,"tesseract").toString());
-//        lcommand.add(Paths.get("storage", "TEST.png").toString());
-//        lcommand.add("3");
-//        lcommand.add("-l");
-//        lcommand.add("chi_sim");
-//        lcommand.add("--psm");
-//        lcommand.add("12");
-//        lcommand.add("dir.exe");
-        ProcessBuilder pb = new ProcessBuilder("cmd.exe /c tesseract");
-        System.out.println(lcommand);
-        pb.redirectErrorStream(true);
-        pb.directory(new File(System.getProperty("user.dir")));
-        pb.redirectErrorStream(true);
-        Process process = pb.start();
-        // 标准输入流（必须写在 waitFor 之前）
-        String inStr = consumeInputStream(process.getInputStream());
-        // 标准错误流（必须写在 waitFor 之前）
-        String errStr = consumeInputStream(process.getErrorStream());
-        int w = process.waitFor();
-//        if (w == 0)// 0代表正常退出
-//        {
-//            byte[] b = new byte[1024];
-//            int readbytes = -1;
-//            StringBuffer sb = new StringBuffer();
-//            try (InputStream in = process.getInputStream()) {
-//                while ((readbytes = in.read(b)) != -1) {
-//                    sb.append(new String(b, 0, readbytes));
-//                }
-//                in.close();
-//                logger.info(sb.toString());
-//            } catch (IOException e2) {
-//                e2.printStackTrace();
-//            }
-//        } else {
-//            String msg = switch (w) {
-//                case 1 -> "Errors accessing files. There may be spaces in your image's filename.";
-//                case 29 -> "Cannot recognize the image or its selected region.";
-//                case 31 -> "Unsupported image format.";
-//                default -> "Errors occurred.";
-//            };
-//            throw new RuntimeException(msg);
-//        }
+      String cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe";
+        Runtime run = Runtime.getRuntime();//返回与当前 Java 应用程序相关的运行时对象
+        try {
+            Process p = run.exec(cmd);// 启动另一个进程来执行命令
+            consumeInputStream(p.getInputStream());
+            if (p.waitFor() != 0) {
+                if (p.exitValue() == 1)//p.exitValue()==0表示正常结束，1：非正常结束
+                    System.err.println("命令执行失败!");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
