@@ -1,5 +1,5 @@
 device:
-
+  adb_path:
 ocr:
   engine: baidu
 

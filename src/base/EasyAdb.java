@@ -3,15 +3,21 @@ package base;
 import com.android.ddmlib.*;
 import exception.*;
 import net.sourceforge.yamlbeans.YamlException;
+import net.sourceforge.yamlbeans.YamlReader;
 import ocr_processor.BaiduOcr;
 import ocr_processor.BaseOcr;
 import org.apache.log4j.Logger;
+import org.jdesktop.swingx.util.OS;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Scanner;
 
 public class EasyAdb {
@@ -27,6 +33,30 @@ public class EasyAdb {
     private StringBuffer buffer;
     private final CollectingOutputReceiver receiver = new CollectingOutputReceiver();
 
+
+    private String getAdbLocation() throws FileNotFoundException, YamlException {
+        YamlReader reader = new YamlReader(new FileReader(Paths.get("config", "config.yaml").toString()));
+        Map ocr_config = reader.read(Map.class);
+        Map ocr_info = (Map) ocr_config.get("device");
+        File _path = new File((String) ocr_info.get("adb_path"));
+        if (_path.exists()) {
+            EasyAdbLogger.logger.info(String.format("adb_path 确认，采用config ADB中配置 %s", ocr_info.get("adb_path")));
+            return (String) ocr_info.get("adb_path");
+        } else {
+            Path adb_path;
+            if (OS.isWindows()) {
+                adb_path = Paths.get("ADB", "win", "adb.exe").toAbsolutePath();
+            } else if (OS.isLinux()) {
+                adb_path = Paths.get("ADB", "linux").toAbsolutePath();
+            } else if (OS.isMacOSX()) {
+                adb_path = Paths.get("ADB", "mac").toAbsolutePath();
+            } else {
+                adb_path = Paths.get("ADB", "win", "adb.exe").toAbsolutePath();
+            }
+            EasyAdbLogger.logger.info(String.format("adb_path 确认，采用 插件自带 ADB 配置 %s", adb_path.toString()));
+            return adb_path.toString();
+        }
+    }
 
     public EasyAdb(boolean do_init) throws DeviceNotFoundException, YamlException, FileNotFoundException, OcrEngineNotActiveException {
         // 初始化adb
@@ -148,10 +178,11 @@ public class EasyAdb {
         }
     }
 
-    private void createDevice() throws DeviceNotFoundException {
+    private void createDevice() throws DeviceNotFoundException, FileNotFoundException, YamlException {
+        String adb_location = getAdbLocation();
         AndroidDebugBridge.init(false);
         AndroidDebugBridge bridge = AndroidDebugBridge.createBridge(
-                "adb", false);
+                adb_location, false);
         waitForDevice(bridge);
         IDevice[] devices = bridge.getDevices();
         if (devices.length == 0) {
