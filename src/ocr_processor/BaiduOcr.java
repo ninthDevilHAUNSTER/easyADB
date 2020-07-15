@@ -31,7 +31,7 @@ public class BaiduOcr implements BaseOcr {
      * https://ai.baidu.com/ai-doc/OCR/nk3h7yc12#通用文字识别
      *
      * @param img BufferedImage
-     * @return
+     * @return 识别结果
      */
     @Override
     public String recognizeSingleText(BufferedImage img) {
@@ -48,7 +48,7 @@ public class BaiduOcr implements BaseOcr {
         res = client.basicGeneral(file, options);
         JSONArray words_result = res.getJSONArray("words_result");
         int num = (Integer) res.get("words_result_num");
-        if (num >=2)
+        if (num >= 2)
             logger.warn("获取多个返回结果，取最前面一个");
         return (String) words_result.getJSONObject(0).get("words");
     }
@@ -57,11 +57,44 @@ public class BaiduOcr implements BaseOcr {
      * 参考代码
      * https://ai.baidu.com/ai-doc/OCR/nk3h7yc12#通用文字识别（含位置信息版）
      *
-     * @param img
+     * @param img BufferedImage
      */
     @Override
-    public void recognizeMultiText(BufferedImage img) {
+    public String recognizeMultiText(BufferedImage img) {
         // 传入可选参数调用接口
+        HashMap<String, String> options = new HashMap<String, String>();
+        StringBuilder result = new StringBuilder();
+        options.put("recognize_granularity", "big");
+        options.put("language_type", "CHN_ENG");
+        options.put("detect_direction", "true");
+        options.put("detect_language", "true");
+        options.put("vertexes_location", "false"); // 取消单字识别
+        options.put("probability", "false"); // 取消置信度获取
+        JSONObject res;
+        // 参数为本地图片二进制数组
+        byte[] file = HelpFunction.getImageBinary(img, "png");
+        res = this.client.general(file, options);
+        JSONArray words_result = res.getJSONArray("words_result");
+        for (int i = 0; i < words_result.length(); i++) {
+            JSONObject _obj = words_result.getJSONObject(i);
+            result.append((String) _obj.get("words"));
+        }
+
+        return result.toString();
+    }
+
+    /**
+     * 参考代码
+     * https://ai.baidu.com/ai-doc/OCR/nk3h7yc12#通用文字识别（含位置信息版）
+     *
+     * @param img  BufferedImage
+     * @param text String 传入的字符
+     * @return int[X, Y, width, length] 4维数组 表示该文字的位置，起点为（X,Y)长宽为width,length的正方形
+     */
+    @Override
+    public int[] orientText(BufferedImage img, String text) {
+        // 传入可选参数调用接口
+        int[] result = new int[]{0, 0, 0, 0};
         HashMap<String, String> options = new HashMap<String, String>();
         options.put("recognize_granularity", "big");
         options.put("language_type", "CHN_ENG");
@@ -73,7 +106,19 @@ public class BaiduOcr implements BaseOcr {
         // 参数为本地图片二进制数组
         byte[] file = HelpFunction.getImageBinary(img, "png");
         res = this.client.general(file, options);
-        System.out.println(res.toString(2));
+        JSONArray words_result = res.getJSONArray("words_result");
+        for (int i = 0; i < words_result.length(); i++) {
+            JSONObject _obj = words_result.getJSONObject(i);
+            if (((String) _obj.get("words")).contains(text)) {
+                JSONObject _detail = _obj.getJSONObject("location");
+                result[0] = (Integer) _detail.get("top");
+                result[1] = (Integer) _detail.get("left");
+                result[2] = (Integer) _detail.get("width");
+                result[3] = (Integer) _detail.get("height");
+                break;
+            }
+        }
+        return result;
     }
 
     @Override
@@ -93,7 +138,6 @@ public class BaiduOcr implements BaseOcr {
             return false;
         }
     }
-
 
     /**
      * @return true if active
@@ -118,6 +162,4 @@ public class BaiduOcr implements BaseOcr {
     public void printOcrInfo() {
         logger.info("Baidu OCR");
     }
-
-
 }

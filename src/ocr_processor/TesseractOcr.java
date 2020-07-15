@@ -1,6 +1,5 @@
 package ocr_processor;
 
-import base.EasyAdb;
 import org.apache.log4j.Logger;
 
 import java.awt.image.BufferedImage;
@@ -8,9 +7,22 @@ import java.awt.image.BufferedImage;
 public class TesseractOcr implements BaseOcr {
     public static Logger logger = Logger.getLogger(TesseractOcr.class.getName());
 
-    @Override
-    public void recognizeText(BufferedImage img) {
 
+
+    @Override
+    public String recognizeSingleText(BufferedImage img) {
+        return null;
+    }
+
+    @Override
+    public String recognizeMultiText(BufferedImage img) {
+        return null;
+    }
+
+    @Override
+    public int[] orientText(BufferedImage img, String text) {
+        int[] result = new int[]{0, 0, 0, 0};
+        return result;
     }
 
     @Override
