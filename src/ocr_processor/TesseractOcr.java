@@ -4,14 +4,6 @@ import org.apache.log4j.Logger;
 
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.jdesktop.swingx.util.OS;
-
-import javax.imageio.ImageIO;
 
 public class TesseractOcr implements BaseOcr {
     public static Logger logger = Logger.getLogger(TesseractOcr.class.getName());
@@ -30,16 +22,23 @@ public class TesseractOcr implements BaseOcr {
     }
 
     private String preprocessCmdCommand(BufferedImage img) throws IOException, InterruptedException {
-      String cmd = "C:\\Program Files\\Tesseract-OCR\\tesseract.exe";
-        Runtime run = Runtime.getRuntime();//返回与当前 Java 应用程序相关的运行时对象
+        String cmd = "D:\\Program Files\\Tesseract-OCR\\tesseract.exe D:\\java_box\\easyADB\\storage\\TEST.png 1.txt -l chi_sim";
+        ProcessBuilder pb = new ProcessBuilder(cmd);
+//        pb.redirectError(new File("stderr.txt"));
+//        pb.redirectOutput(new File("stdout.txt"));
         try {
-            Process p = run.exec(cmd);// 启动另一个进程来执行命令
-            consumeInputStream(p.getInputStream());
+            Process p = pb.start();
+            // Write to the standard input stream
+//            OutputStream stdin = p.getOutputStream();
+//            stdin.write(HelpFunction.getImageBinary(img, "png"));
+            InputStream stdout = p.getInputStream();
+            consumeInputStream(stdout);
+
             if (p.waitFor() != 0) {
-                if (p.exitValue() == 1)//p.exitValue()==0表示正常结束，1：非正常结束
-                    System.err.println("命令执行失败!");
+                if (p.exitValue() == 1)
+                    System.err.println("fail!");
             }
-        } catch (Exception e) {
+        } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         }
         return null;

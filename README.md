@@ -34,11 +34,15 @@
     - [x] P-Hash相似度
     - [x] 色彩直方图相似度
 -  OCR 
-  - [ ] Tesseract OCR 支持
+  - [x] Baidu OCR 支持
+    - [x] OCR 结果简单提取
+    - [x] OCR 结果富文本解析
+    - [x] OCR 结果富文本位置提取
+  - [ ] Tesseract OCR 支持(遇到了各种坑，打算放弃支持)
     - [ ] OCR 结果简单提取
     - [ ] OCR 结果富文本解析
     - [ ] OCR 结果富文本位置提取
-  - [x] Baidu OCR 支持
+  - [x] Youtu OCR 支持 (腾讯OCR)
     - [x] OCR 结果简单提取
     - [x] OCR 结果富文本解析
     - [x] OCR 结果富文本位置提取

@@ -1,4 +1,6 @@
-package base;
+package util;
+
+import org.jetbrains.annotations.Nullable;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -27,7 +29,7 @@ public class HelpFunction {
      * @param imgType String
      * @return byte Image
      */
-    public static byte[] getImageBinary(BufferedImage bi, String imgType) {
+    public static byte @Nullable [] getImageBinary(BufferedImage bi, String imgType) {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(bi, imgType, baos);  //经测试转换的图片是格式这里就什么格式，否则会失真

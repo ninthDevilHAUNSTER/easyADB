@@ -1,9 +1,0 @@
-device:
-  adb_path:
-ocr:
-  engine: baidu
-
-baidu_api:
-  app_id: 16510694
-  app_key: oXnAU4iOpiPVIp3OqwXHNAhs
-  app_secret: Mc2MxgKURjsTqoeQpcBV3dbEpg7XdVlS

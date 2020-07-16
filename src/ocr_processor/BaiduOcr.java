@@ -1,6 +1,6 @@
 package ocr_processor;
 
-import base.HelpFunction;
+import util.HelpFunction;
 import com.baidu.aip.ocr.AipOcr;
 import exception.OcrEngineNotActiveException;
 import net.sourceforge.yamlbeans.YamlException;
