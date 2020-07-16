@@ -29,3 +29,4 @@ out/
 rubbish/
 logs/
 storage/ORIENT_TEST.png
+config/config.yaml
