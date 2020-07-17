@@ -20,43 +20,45 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Scanner;
 
+import org.apache.log4j.Logger;
+
 public class EasyAdb {
 //    variables
 
     //    public
     public IDevice device;
-    public static EasyAdbLogger logger = new EasyAdbLogger();
+    public static Logger logger = Logger.getLogger(EasyAdb.class.getName());
 
-    //    private
-    private BaseOcr ocr;
-    private String os_location;
-    private StringBuffer buffer;
     private final CollectingOutputReceiver receiver = new CollectingOutputReceiver();
 
-
-    private String getAdbLocation() throws FileNotFoundException, YamlException {
-        YamlReader reader = new YamlReader(new FileReader(Paths.get("config", "config.yaml").toString()));
-        Map ocr_config = reader.read(Map.class);
-        Map ocr_info = (Map) ocr_config.get("device");
-        File _path = new File((String) ocr_info.get("adb_path"));
-        if (_path.exists()) {
-            EasyAdbLogger.logger.info(String.format("adb_path 确认，采用config ADB中配置 %s", ocr_info.get("adb_path")));
-            return (String) ocr_info.get("adb_path");
-        } else {
-            Path adb_path;
-            if (OS.isWindows()) {
-                adb_path = Paths.get("ADB", "win", "adb.exe").toAbsolutePath();
-            } else if (OS.isLinux()) {
-                throw new FileNotFoundException("adb指令未安装，请输入类似 'apt-get install adb '的指令安装");
-//                adb_path = Paths.get("ADB", "linux").toAbsolutePath();
-            } else if (OS.isMacOSX()) {
-                throw new FileNotFoundException("adb指令未安装，请输入类似 'brew cask install android-platform-tools' 的指令安装");
-//                adb_path = Paths.get("ADB", "mac").toAbsolutePath();
+    private String getAdbLocation() throws FileNotFoundException {
+        try {
+            YamlReader reader = new YamlReader(new FileReader(Paths.get("config", "config.yaml").toString()));
+            Map ocr_config = reader.read(Map.class);
+            Map ocr_info = (Map) ocr_config.get("device");
+            File _path = new File((String) ocr_info.get("adb_path"));
+            if (_path.exists()) {
+                logger.info(String.format("adb_path 确认，采用config ADB中配置 %s", ocr_info.get("adb_path")));
+                return (String) ocr_info.get("adb_path");
             } else {
-                adb_path = Paths.get("ADB", "win", "adb.exe").toAbsolutePath();
+                Path adb_path;
+                if (OS.isWindows()) {
+                    adb_path = Paths.get("ADB", "win", "adb.exe").toAbsolutePath();
+                } else if (OS.isLinux()) {
+                    throw new FileNotFoundException("adb指令未安装，请输入类似 'apt-get install adb '的指令安装");
+//                adb_path = Paths.get("ADB", "linux").toAbsolutePath();
+                } else if (OS.isMacOSX()) {
+                    throw new FileNotFoundException("adb指令未安装，请输入类似 'brew cask install android-platform-tools' 的指令安装");
+//                adb_path = Paths.get("ADB", "mac").toAbsolutePath();
+                } else {
+                    adb_path = Paths.get("ADB", "win", "adb.exe").toAbsolutePath();
+                }
+                logger.info(String.format("adb_path 确认，采用 插件自带 ADB 配置 %s", adb_path.toString()));
+                return adb_path.toString();
             }
-            EasyAdbLogger.logger.info(String.format("adb_path 确认，采用 插件自带 ADB 配置 %s", adb_path.toString()));
-            return adb_path.toString();
+        } catch (YamlException e) {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -74,9 +76,9 @@ public class EasyAdb {
     }
 
     public void executeCommand(String command) throws TimeoutException, AdbCommandRejectedException, ShellCommandUnresponsiveException, IOException {
-        EasyAdbLogger.logger.debug(command);
+        logger.debug(command);
         this.device.executeShellCommand(command, this.receiver);
-        EasyAdbLogger.logger.debug(this.receiver.getOutput());
+        logger.debug(this.receiver.getOutput());
     }
 
     /**
@@ -189,14 +191,16 @@ public class EasyAdb {
             YamlReader reader = new YamlReader(new FileReader(Paths.get("config", "config.yaml").toString()));
             Map ocr_config = reader.read(Map.class);
             Map ocr_engine = (Map) ocr_config.get("ocr");
+            //    private
+            BaseOcr ocr;
             if (ocr_engine.get("engine") == "baidu") {
-                this.ocr = new BaiduOcr();
+                ocr = new BaiduOcr();
             } else if (ocr_config.get("engine") == "tesseract") {
-                this.ocr = new TesseractOcr();
+                ocr = new TesseractOcr();
             } else {
-                this.ocr = new TesseractOcr();
+                ocr = new TesseractOcr();
             }
-            this.ocr.isOcrActive();
+            ocr.isOcrActive();
         } catch (OcrEngineNotSupportException | OcrEngineNotActiveException | FileNotFoundException | YamlException e) {
             e.printStackTrace();
         }
@@ -211,7 +215,7 @@ public class EasyAdb {
         IDevice[] devices = bridge.getDevices();
         if (devices.length == 0) {
             // no device
-            EasyAdbLogger.print("检测到 0 台 连接设备，初始化失败", 2, 4);
+            logger.fatal("检测到 0 台 连接设备，初始化失败");
             throw new DeviceNotFoundException("检测到 0 台 连接设备，初始化失败");
         } else if (devices.length == 1) {
             // one device
@@ -226,7 +230,7 @@ public class EasyAdb {
             int i = 0;
             boolean FlAG = false;
             while (!FlAG) {
-                EasyAdbLogger.print("发现多个设备，自动连接失败。请输入编号：,输入0退出当前程序");
+                System.out.println("发现多个设备，自动连接失败。请输入编号：,输入0退出当前程序");
                 if (scan.hasNextInt()) {
                     // 判断输入的是否是整数
                     i = scan.nextInt();
@@ -238,15 +242,15 @@ public class EasyAdb {
                     } else if (i == 0) {
                         System.exit(0);
                     } else {
-                        EasyAdbLogger.print("输入不正确！");
+                        System.out.println("输入不正确！");
                     }
                 } else {
                     // 输入错误的信息
-                    EasyAdbLogger.print("输入不正确！");
+                    System.out.println("输入不正确！");
                 }
             }
         }
-        EasyAdbLogger.logger.info("设备连接成功，当前设备名称\t" + this.device.getName());
+        logger.info("设备连接成功，当前设备名称\t" + this.device.getName());
     }
 
     private static void waitForDevice(AndroidDebugBridge bridge) {
@@ -258,7 +262,7 @@ public class EasyAdb {
             } catch (InterruptedException ignored) {
             }
             if (count > 300) {
-                EasyAdbLogger.logger.error("Time out");
+                logger.error("Time out");
                 break;
             }
         }
