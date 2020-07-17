@@ -18,6 +18,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.jdesktop.swingx.util.OS;
@@ -29,11 +30,11 @@ public class Test {
         BaseOcr ocr = new TesseractOcr();
         InputStream is = new FileInputStream(new File("storage/ORIENT_TEST.png"));
         BufferedImage img = ImageIO.read(is);
-        logger.info(ocr.recognizeSingleText(img));
+        logger.info(Arrays.toString(ocr.orientText(img, "TW-8")));
     }
 
     private static void testAdbConnection() throws Exception {
-        EasyAdb adb = new EasyAdb(true);
+        EasyAdb adb = new EasyAdb();
         adb.getScreenshot(132, 312, 231, 312);
     }
 

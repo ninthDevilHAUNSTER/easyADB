@@ -1,5 +1,6 @@
 package ocr_processor;
 
+import exception.OcrEngineNotSupportException;
 import util.HelpFunction;
 import com.baidu.aip.ocr.AipOcr;
 import exception.OcrEngineNotActiveException;
@@ -22,7 +23,7 @@ public class BaiduOcr implements BaseOcr {
     private static String app_key;
     private static String app_secret;
 
-    public BaiduOcr() throws YamlException, FileNotFoundException {
+    public BaiduOcr() throws OcrEngineNotSupportException {
         initOcr();
     }
 
@@ -44,7 +45,7 @@ public class BaiduOcr implements BaseOcr {
         JSONObject res;
 
         // 参数为本地图片二进制数组
-        byte[] file = HelpFunction.getImageBinary(img, "png");
+        byte[] file = HelpFunction.getBinaryImage(img, "png");
         res = client.basicGeneral(file, options);
         JSONArray words_result = res.getJSONArray("words_result");
         int num = (Integer) res.get("words_result_num");
@@ -72,7 +73,7 @@ public class BaiduOcr implements BaseOcr {
         options.put("probability", "false"); // 取消置信度获取
         JSONObject res;
         // 参数为本地图片二进制数组
-        byte[] file = HelpFunction.getImageBinary(img, "png");
+        byte[] file = HelpFunction.getBinaryImage(img, "png");
         res = this.client.general(file, options);
         JSONArray words_result = res.getJSONArray("words_result");
         for (int i = 0; i < words_result.length(); i++) {
@@ -104,7 +105,7 @@ public class BaiduOcr implements BaseOcr {
         options.put("probability", "false"); // 取消置信度获取
         JSONObject res;
         // 参数为本地图片二进制数组
-        byte[] file = HelpFunction.getImageBinary(img, "png");
+        byte[] file = HelpFunction.getBinaryImage(img, "png");
         res = this.client.general(file, options);
         JSONArray words_result = res.getJSONArray("words_result");
         for (int i = 0; i < words_result.length(); i++) {
@@ -122,7 +123,7 @@ public class BaiduOcr implements BaseOcr {
     }
 
     @Override
-    public boolean initOcr() throws YamlException, FileNotFoundException {
+    public boolean initOcr() throws OcrEngineNotSupportException {
         try {
             YamlReader reader = new YamlReader(new FileReader("config/config.yaml"));
             // 总感觉我YAML的读法怪怪的
@@ -135,7 +136,7 @@ public class BaiduOcr implements BaseOcr {
             return true;
         } catch (YamlException | FileNotFoundException e) {
             e.printStackTrace();
-            return false;
+            throw new OcrEngineNotSupportException();
         }
     }
 

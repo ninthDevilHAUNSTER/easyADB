@@ -1,6 +1,7 @@
 package ocr_processor;
 
 import exception.OcrEngineNotActiveException;
+import exception.OcrEngineNotSupportException;
 import net.sourceforge.yamlbeans.YamlException;
 
 import java.awt.image.BufferedImage;
@@ -8,16 +9,16 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public interface BaseOcr {
-    public String recognizeSingleText(BufferedImage img) throws IOException, InterruptedException;
+     String recognizeSingleText(BufferedImage img);
 
-    public String recognizeMultiText(BufferedImage img);
+     String recognizeMultiText(BufferedImage img);
 
-    public int[] orientText(BufferedImage img,String text);
+     int[] orientText(BufferedImage img, String text);
 
 
-    public boolean initOcr() throws YamlException, FileNotFoundException;
+     boolean initOcr() throws OcrEngineNotSupportException;
 
-    public boolean isOcrActive() throws OcrEngineNotActiveException;
+     boolean isOcrActive() throws OcrEngineNotActiveException;
 
-    public void printOcrInfo();
+     void printOcrInfo();
 }

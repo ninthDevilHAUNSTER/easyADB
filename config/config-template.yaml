@@ -1,0 +1,9 @@
+device:
+
+ocr:
+  engine: baidu
+
+baidu_api:
+  app_id:
+  app_key:
+  app_secret:

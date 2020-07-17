@@ -6,10 +6,10 @@ import net.sourceforge.yamlbeans.YamlException;
 import net.sourceforge.yamlbeans.YamlReader;
 import ocr_processor.BaiduOcr;
 import ocr_processor.BaseOcr;
-import org.apache.log4j.Logger;
+import ocr_processor.TesseractOcr;
 import org.jdesktop.swingx.util.OS;
+import util.HelpFunction;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -60,12 +60,16 @@ public class EasyAdb {
         }
     }
 
-    public EasyAdb(boolean do_init) throws DeviceNotFoundException, YamlException, FileNotFoundException, OcrEngineNotActiveException {
-        // 初始化adb
-        this.ocr = new BaiduOcr();
-        this.ocr.isOcrActive();
-        if (do_init) {
-            createDevice();
+
+    public EasyAdb() throws DeviceNotFoundException {
+        try {
+            // 复制config.yaml
+            HelpFunction.copyConfigYaml();
+            // 初始化adb
+            initOcr();
+            initDevice();
+        } catch (YamlException | IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -180,7 +184,25 @@ public class EasyAdb {
         }
     }
 
-    private void createDevice() throws DeviceNotFoundException, FileNotFoundException, YamlException {
+    private void initOcr() {
+        try {
+            YamlReader reader = new YamlReader(new FileReader(Paths.get("config", "config.yaml").toString()));
+            Map ocr_config = reader.read(Map.class);
+            Map ocr_engine = (Map) ocr_config.get("ocr");
+            if (ocr_engine.get("engine") == "baidu") {
+                this.ocr = new BaiduOcr();
+            } else if (ocr_config.get("engine") == "tesseract") {
+                this.ocr = new TesseractOcr();
+            } else {
+                this.ocr = new TesseractOcr();
+            }
+            this.ocr.isOcrActive();
+        } catch (OcrEngineNotSupportException | OcrEngineNotActiveException | FileNotFoundException | YamlException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initDevice() throws DeviceNotFoundException, FileNotFoundException, YamlException {
         String adb_location = getAdbLocation();
         AndroidDebugBridge.init(false);
         AndroidDebugBridge bridge = AndroidDebugBridge.createBridge(
