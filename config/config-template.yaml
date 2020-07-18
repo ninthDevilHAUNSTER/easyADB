@@ -1,9 +1,12 @@
 device:
-
+  #  ADB 文件路径，如果为空，则将采用ADB文件夹下的ADB文件，该选项只对windows有效，Linux,Mac用户许自行安装adb命令
+  adb_path:
 ocr:
+  #  OCR 引擎选项，可选择选项包括 baidu | tesseract 默认 tesseract
   engine: baidu
 
 baidu_api:
+  #  baidu OCR 相关设置
   app_id:
   app_key:
   app_secret:
