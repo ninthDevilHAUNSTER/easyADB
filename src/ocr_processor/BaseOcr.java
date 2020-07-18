@@ -9,16 +9,18 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public interface BaseOcr {
-     String recognizeSingleText(BufferedImage img);
+    String getOcrName();
 
-     String recognizeMultiText(BufferedImage img);
+    String recognizeSingleText(BufferedImage img);
 
-     int[] orientText(BufferedImage img, String text);
+    String recognizeMultiText(BufferedImage img);
+
+    int[] orientText(BufferedImage img, String text);
 
 
-     boolean initOcr() throws OcrEngineNotSupportException;
+    boolean initOcr() throws OcrEngineNotSupportException;
 
-     boolean isOcrActive() throws OcrEngineNotActiveException;
+    boolean isOcrActive() throws OcrEngineNotActiveException;
 
-     void printOcrInfo();
+    void printOcrInfo();
 }

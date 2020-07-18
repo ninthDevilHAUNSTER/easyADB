@@ -60,6 +60,8 @@ public class TesseractOcr implements BaseOcr {
                 String[] _buf = ocr_line.attr("title").split("[ ;]");
                 if (_buf != null && _buf.length > 5) {
                     int[] pos = {Integer.parseInt(_buf[1]), Integer.parseInt(_buf[2]), Integer.parseInt(_buf[3]), Integer.parseInt(_buf[4]),};
+                    pos[2] = pos[2] - pos[0];
+                    pos[3] = pos[3] - pos[1];
                     String res = ocr_line.text().replaceAll("\\pP|\\s*", "");
                     result.put(res, pos);
                 }
@@ -101,6 +103,11 @@ public class TesseractOcr implements BaseOcr {
         return result;
     }
 
+
+    @Override
+    public String getOcrName() {
+        return "Tesseract Ocr";
+    }
 
     @Override
     public String recognizeSingleText(BufferedImage img) {

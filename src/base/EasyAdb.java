@@ -31,6 +31,11 @@ public class EasyAdb {
 
     private final CollectingOutputReceiver receiver = new CollectingOutputReceiver();
 
+    public String getDeiceName() {
+        assert device != null;
+        return this.device.getName();
+    }
+
     private String getAdbLocation() throws FileNotFoundException {
         try {
             YamlReader reader = new YamlReader(new FileReader(Paths.get("config", "config.yaml").toString()));

@@ -27,6 +27,11 @@ public class BaiduOcr implements BaseOcr {
         initOcr();
     }
 
+    @Override
+    public String getOcrName() {
+        return "Baidu Ocr";
+    }
+
     /**
      * 参考代码
      * https://ai.baidu.com/ai-doc/OCR/nk3h7yc12#通用文字识别
@@ -112,8 +117,8 @@ public class BaiduOcr implements BaseOcr {
             JSONObject _obj = words_result.getJSONObject(i);
             if (((String) _obj.get("words")).contains(text)) {
                 JSONObject _detail = _obj.getJSONObject("location");
-                result[0] = (Integer) _detail.get("top");
-                result[1] = (Integer) _detail.get("left");
+                result[0] = (Integer) _detail.get("left");
+                result[1] = (Integer) _detail.get("top");
                 result[2] = (Integer) _detail.get("width");
                 result[3] = (Integer) _detail.get("height");
                 break;

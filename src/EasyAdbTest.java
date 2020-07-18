@@ -1,0 +1,88 @@
+
+import base.EasyAdb;
+
+import ocr_processor.BaiduOcr;
+import ocr_processor.BaseOcr;
+import ocr_processor.TesseractOcr;
+import org.apache.log4j.Logger;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.Arrays;
+
+public class EasyAdbTest {
+    public static Logger logger = Logger.getLogger(EasyAdbTest.class.getName());
+
+    public static void testOcrOrientText(BaseOcr ocr) throws Exception {
+        logger.info("testOcrOrientText Using Ocr :: " + ocr.getOcrName());
+        InputStream is = new FileInputStream(new File("storage/ORIENT_TEST.png"));
+        BufferedImage img = ImageIO.read(is);
+        logger.info(Arrays.toString(ocr.orientText(img, "TW-8")));
+    }
+
+    public static void testOcrSingleText(BaseOcr ocr) throws Exception {
+        logger.info("testOcrSingleText Using Ocr :: " + ocr.getOcrName());
+        InputStream is = new FileInputStream(new File("storage/TEST.png"));
+        BufferedImage img = ImageIO.read(is);
+        logger.info(ocr.recognizeSingleText(img));
+
+    }
+
+    public static void testOcrMultiText(BaseOcr ocr) throws Exception {
+        logger.info("testOcrMultiText Using Ocr :: " + ocr.getOcrName());
+        InputStream is = new FileInputStream(new File("storage/ORIENT_TEST.png"));
+        BufferedImage img = ImageIO.read(is);
+        logger.info(ocr.recognizeMultiText(img));
+    }
+
+
+    public static void testAdbScreenShoot(EasyAdb adb) throws Exception {
+        logger.info("testAdbConnection With device :: " + adb.getDeiceName());
+        BufferedImage img1 = adb.getScreenshot();
+//
+//        File outputfile1 = new File("result1.png");
+//        ImageIO.write(img1, "png", outputfile1);
+//        logger.info("Img1 saved");
+
+        BufferedImage img2 = adb.getScreenshot(132, 312, 231, 312);
+
+//        File outputfile2 = new File("result2.png");
+//        ImageIO.write(img2, "png", outputfile2);
+
+        logger.info("Img2 saved");
+    }
+
+    public static EasyAdb testAdbConnection() throws Exception {
+        return new EasyAdb();
+    }
+
+    public static void main(String[] args) throws Exception {
+        long startTime, endTime;
+        BaseOcr ocr1 = new BaiduOcr();
+//        testOcrSingleText(ocr1);
+//        testOcrMultiText(ocr1);
+
+        startTime = System.currentTimeMillis();   //获取开始时间
+        testOcrOrientText(ocr1);
+        endTime = System.currentTimeMillis(); //获取结束时间
+        System.out.println("程序运行时间： " + (endTime - startTime) + "ms");
+//      2367ms
+
+        BaseOcr ocr2 = new TesseractOcr();
+//        testOcrSingleText(ocr2);
+//        testOcrMultiText(ocr2);
+        startTime = System.currentTimeMillis();   //获取开始时间
+        testOcrOrientText(ocr2);
+        endTime = System.currentTimeMillis(); //获取结束时间
+        System.out.println("程序运行时间： " + (endTime - startTime) + "ms");
+//      2188ms
+        EasyAdb adb = testAdbConnection();
+        startTime = System.currentTimeMillis();   //获取开始时间
+        testAdbScreenShoot(adb);
+        endTime = System.currentTimeMillis(); //获取结束时间
+        System.out.println("程序运行时间： " + (endTime - startTime) + "ms");
+//      2341ms
+    }
+}
+
