@@ -89,6 +89,29 @@ public class BaiduOcr implements BaseOcr {
         return result.toString();
     }
 
+    @Override
+    public String recognizeMultiText(BufferedImage img, String separator) {
+        // 传入可选参数调用接口
+        HashMap<String, String> options = new HashMap<String, String>();
+        StringBuilder result = new StringBuilder();
+        options.put("recognize_granularity", "big");
+        options.put("language_type", "CHN_ENG");
+        options.put("detect_direction", "true");
+        options.put("detect_language", "true");
+        options.put("vertexes_location", "false"); // 取消单字识别
+        options.put("probability", "false"); // 取消置信度获取
+        JSONObject res;
+        // 参数为本地图片二进制数组
+        byte[] file = HelpFunction.getBinaryImage(img, "png");
+        res = this.client.general(file, options);
+        JSONArray words_result = res.getJSONArray("words_result");
+        for (int i = 0; i < words_result.length(); i++) {
+            JSONObject _obj = words_result.getJSONObject(i);
+            result.append((String) _obj.get("words")).append(separator);
+        }
+        return result.toString();
+    }
+
     /**
      * 参考代码
      * https://ai.baidu.com/ai-doc/OCR/nk3h7yc12#通用文字识别（含位置信息版）

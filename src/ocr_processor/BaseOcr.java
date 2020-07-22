@@ -15,6 +15,8 @@ public interface BaseOcr {
 
     String recognizeMultiText(BufferedImage img);
 
+    String recognizeMultiText(BufferedImage img,String separator);
+
     int[] orientText(BufferedImage img, String text);
 
 

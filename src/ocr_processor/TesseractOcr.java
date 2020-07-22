@@ -127,6 +127,18 @@ public class TesseractOcr implements BaseOcr {
     }
 
     @Override
+    public String recognizeMultiText(BufferedImage img, String separator) {
+        if (OS.isWindows()) {
+            HashMap<String, int[]> resMap = runTesseractWinWithHocr(img, "chi_sim", 12);
+            Set<String> s = resMap.keySet();
+            StringBuilder result = new StringBuilder();
+            result.append(s).append(separator);
+            return s.toString();
+        }
+        return null;
+    }
+
+    @Override
     public int[] orientText(BufferedImage img, String text) {
         int[] result = new int[]{0, 0, 0, 0};
         HashMap<String, int[]> resMap = runTesseractWinWithHocr(img, "chi_sim", 12);
