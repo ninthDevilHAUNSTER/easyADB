@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 
 
 public class Main {
-
     public static void processImg() throws IOException, OcrEngineNotSupportException, InterruptedException {
         BaseOcr ocr = new BaiduOcr();
         String dirStr = Paths.get("C:\\Users\\shaob\\Downloads\\霓虹深渊图鉴8.0\\word\\media").toString();

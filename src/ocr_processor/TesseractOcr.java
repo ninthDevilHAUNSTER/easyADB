@@ -89,13 +89,13 @@ public class TesseractOcr implements BaseOcr {
                 result = result.substring(0, result.length() - 1); // remove the last character \x0F
                 logger.info(result);
             } else {
-                String msg = switch (exitVal) {
-                    case 1 -> "Errors accessing files.There may be spaces in your image's filename.";
-                    case 29 -> "Cannot recongnize the image or its selected region.";
-                    case 31 -> "Unsupported image format.";
-                    default -> "Errors occurred.";
-                };
-                logger.fatal(msg);
+//                String msg = switch (exitVal) {
+//                    case 1 -> "Errors accessing files.There may be spaces in your image's filename.";
+//                    case 29 -> "Cannot recongnize the image or its selected region.";
+//                    case 31 -> "Unsupported image format.";
+//                    default -> "Errors occurred.";
+//                };
+//                logger.fatal(msg);
             }
         } catch (IOException e) {
             e.printStackTrace();
